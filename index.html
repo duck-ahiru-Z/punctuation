@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>句読点変換 - てんまるダック</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duck-yellow: #FFEB3B;
+            --duck-dark-yellow: #FBC02D;
+            --duck-orange: #FF9800;
+            --duck-white: #FFFDE7;
+            --text-color: #5D4037;
+            --water-cyan-light: #E0F7FA; /* 背景色 */
+            --water-cyan-dark: #B2EBF2;  /* 水玉の色 */
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: var(--water-cyan-light);
+            /* 静止した水玉模様（アニメーションなし） */
+            background-image: radial-gradient(var(--water-cyan-dark) 20%, transparent 20%), radial-gradient(var(--water-cyan-dark) 20%, transparent 20%);
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        .duck-container {
+            background: var(--duck-yellow);
+            padding: 35px;
+            border-radius: 45px;
+            /* 影と内側のツヤ感 */
+            box-shadow: 
+                0 15px 35px rgba(0,139,139,0.15),
+                inset 0 0 30px rgba(255,255,255,0.6);
+            width: 100%;
+            max-width: 600px;
+            border: 10px solid var(--duck-dark-yellow);
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: var(--text-color);
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            padding-left: 12px;
+            color: #4E342E;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 18px;
+            border: 5px solid var(--duck-dark-yellow);
+            border-radius: 25px;
+            font-size: 16px;
+            resize: none;
+            box-sizing: border-box;
+            font-family: inherit;
+            background-color: var(--duck-white);
+            color: var(--text-color);
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        textarea:focus {
+            border-color: var(--duck-orange);
+            box-shadow: 0 0 0 5px rgba(255, 152, 0, 0.3);
+            background-color: #fff;
+        }
+
+        .arrow-area {
+            text-align: center;
+            font-size: 32px;
+            color: var(--duck-orange);
+            margin: -15px 0 5px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 0 rgba(255,255,255,1);
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to bottom, #FFA726, #FB8C00);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #E65100, 0 10px 20px rgba(230, 81, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .copy-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #E65100, 0 5px 10px rgba(230, 81, 0, 0.2);
+        }
+        
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: rgba(62, 39, 35, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="duck-container">
+    <h1>てんまる変換ダック</h1>
+
+    <div class="input-group">
+        <label>ここに元の文章を入れるクワ</label>
+        <textarea id="input-text" placeholder="例：今日は、とてもいい天気です。"></textarea>
+    </div>
+
+    <div class="arrow-area">▼ 変換 ▼</div>
+
+    <div class="input-group">
+        <label>変換した文章になったクワ！</label>
+        <textarea id="output-text" readonly placeholder="例：今日は, とてもいい天気です. "></textarea>
+    </div>
+
+    <button class="copy-btn" id="copy-btn">結果をコピーする！</button>
+</div>
+
+<div id="toast">コピーしたクワ！</div>
+
+<script>
+    const inputText = document.getElementById('input-text');
+    const outputText = document.getElementById('output-text');
+    const copyBtn = document.getElementById('copy-btn');
+    const toast = document.getElementById('toast');
+
+    inputText.addEventListener('input', () => {
+        let text = inputText.value;
+        text = text.replace(/、/g, ', ');
+        text = text.replace(/。/g, '. ');
+        outputText.value = text;
+    });
+
+    copyBtn.addEventListener('click', () => {
+        if (!outputText.value) return;
+        outputText.select();
+        outputText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(outputText.value).then(() => {
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        });
+    });
+</script>
+
+</body>
+</html>
