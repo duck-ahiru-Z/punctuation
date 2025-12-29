@@ -168,7 +168,7 @@
 
     <div class="input-group">
         <label>変換した文章になったクワ！</label>
-        <textarea id="output-text" readonly placeholder="例：今日は, とてもいい天気です. "></textarea>
+        <textarea id="output-text" readonly placeholder="例：今日は，とてもいい天気です．"></textarea>
     </div>
 
     <button class="copy-btn" id="copy-btn">結果をコピーする！</button>
@@ -184,8 +184,8 @@
 
     inputText.addEventListener('input', () => {
         let text = inputText.value;
-        text = text.replace(/、/g, ', ');
-        text = text.replace(/。/g, '. ');
+        text = text.replace(/、/g, '，');
+        text = text.replace(/。/g, '．');
         outputText.value = text;
     });
 
@@ -201,4 +201,5 @@
 </script>
 
 </body>
+
 </html>
